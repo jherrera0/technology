@@ -1,4 +1,4 @@
-package reactive_backend.technology.application.http.dto;
+package reactive_backend.technology.application.http.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

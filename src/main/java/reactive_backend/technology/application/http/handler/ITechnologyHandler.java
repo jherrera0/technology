@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface ITechnologyHandler {
     Mono<ServerResponse> saveTechnology(ServerRequest request);
+
+    Mono<ServerResponse> listTechnology(ServerRequest request);
 }

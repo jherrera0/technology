@@ -1,10 +1,15 @@
 package reactive_backend.technology.application.jpa.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import reactive_backend.technology.application.jpa.mapper.ITechnologyEntityMapper;
 import reactive_backend.technology.application.jpa.repository.ITechnologyRepository;
+import reactive_backend.technology.domain.model.PageCustom;
 import reactive_backend.technology.domain.model.Technology;
 import reactive_backend.technology.domain.spi.ITechnologyPersistencePort;
+import reactive_backend.technology.domain.util.ConstValidation;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -23,5 +28,21 @@ public class TechnologyJpaAdapter implements ITechnologyPersistencePort {
     public Mono<Boolean> technologyExistsByName(String name) {
         return technologyRepository.existsByName(name);
     }
+
+    @Override
+    public Mono<PageCustom<Technology>> getAllTechnologies(String orderDirection, Integer pageSize, Integer currentPage) {
+        Pageable pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.fromString(orderDirection), ConstValidation.NAME));
+
+        return technologyRepository.findAllBy(pageable)
+                .collectList()
+                .zipWith(technologyRepository.count())
+                .map(tuple -> new PageCustom<>(
+                        currentPage,
+                        pageSize,
+                        (int) Math.ceil((double) tuple.getT2() / pageSize),
+                        technologyEntityMapper.toDomainList(tuple.getT1())
+                ));
+    }
+
 
 }
