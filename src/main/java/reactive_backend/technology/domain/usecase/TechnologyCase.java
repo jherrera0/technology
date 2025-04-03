@@ -32,7 +32,12 @@ public class TechnologyCase implements ITechnologyServicePort {
         Mono<PageCustom<Technology>> error = validateParameters(orderDirection, pageSize, currentPage);
         if (error != null) return error;
         return technologyPersistencePort.getAllTechnologies(orderDirection, pageSize, currentPage)
-                .flatMap(Mono::just);
+                .flatMap(page -> {
+                    if (page.getTotalPages() < page.getCurrentPage()+ConstValidation.ONE) {
+                        return Mono.error(new ListTechnologyPageInvalidException());
+                    }
+                    return Mono.just(page);
+                });
     }
 
     private static Mono<PageCustom<Technology>> validateParameters(String orderDirection, Integer pageSize, Integer currentPage) {

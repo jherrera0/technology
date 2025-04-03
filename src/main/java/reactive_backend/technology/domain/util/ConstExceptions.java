@@ -10,6 +10,7 @@ public class ConstExceptions {
     public static final String LIST_TECHNOLOGY_ORDER_DIRECTION_INVALID = "Order direction must be either ASC or DESC";
     public static final String LIST_TECHNOLOGY_PAGE_SIZE_INVALID = "Page size must be greater than 0";
     public static final String LIST_TECHNOLOGY_CURRENT_PAGE_INVALID = "Current page must be greater than 0";
+    public static final String LIST_TECHNOLOGY_PAGE_INVALID_EXCEPTION = "Current page must be less than total pages";
 
     private ConstExceptions() {
     }

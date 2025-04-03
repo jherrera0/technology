@@ -6,10 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactive_backend.technology.domain.exception.ListTechnologyCurrentPageInvalidException;
-import reactive_backend.technology.domain.exception.ListTechnologyOrderDirectionInvalidException;
-import reactive_backend.technology.domain.exception.ListTechnologyPageSizeInvalidException;
-import reactive_backend.technology.domain.exception.TechnologyAlreadyExistsException;
+import reactive_backend.technology.domain.exception.*;
 import reactive_backend.technology.domain.model.PageCustom;
 import reactive_backend.technology.domain.model.Technology;
 import reactive_backend.technology.domain.spi.ITechnologyPersistencePort;
@@ -124,5 +121,21 @@ class TechnologyCaseTest {
                 .verify();
 
         verify(technologyPersistencePort, never()).getAllTechnologies(anyString(), anyInt(), anyInt());
+    }
+    @Test
+    void listTechnology_ShouldThrowException_WhenPageExceedsTotalPages() {
+        String orderDirection = "asc";
+        int pageSize = 5;
+        int currentPage = 2;
+
+        PageCustom<Technology> pageCustom = new PageCustom<>(1, 5, 1, List.of(new Technology(1, "Java", "1")));
+        when(technologyPersistencePort.getAllTechnologies(orderDirection, pageSize, currentPage))
+                .thenReturn(Mono.just(pageCustom));
+
+        StepVerifier.create(technologyCase.listTechnology(orderDirection, pageSize, currentPage))
+                .expectError(ListTechnologyPageInvalidException.class)
+                .verify();
+
+        verify(technologyPersistencePort, times(1)).getAllTechnologies(orderDirection, pageSize, currentPage);
     }
 }
