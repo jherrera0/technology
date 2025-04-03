@@ -1,7 +1,8 @@
 package reactive_backend.technology.domain.usecase;
 
 import reactive_backend.technology.domain.api.ITechnologyServicePort;
-import reactive_backend.technology.domain.exception.TechnologyAlreadyExistsException;
+import reactive_backend.technology.domain.exception.*;
+import reactive_backend.technology.domain.model.PageCustom;
 import reactive_backend.technology.domain.model.Technology;
 import reactive_backend.technology.domain.spi.ITechnologyPersistencePort;
 import reactive_backend.technology.domain.util.ConstValidation;
@@ -24,5 +25,29 @@ public class TechnologyCase implements ITechnologyServicePort {
                     }
                     return technologyPersistencePort.saveTechnology(technology);
                 });
+    }
+
+    @Override
+    public Mono<PageCustom<Technology>> listTechnology(String orderDirection, Integer pageSize, Integer currentPage) {
+        Mono<PageCustom<Technology>> error = validateParameters(orderDirection, pageSize, currentPage);
+        if (error != null) return error;
+        return technologyPersistencePort.getAllTechnologies(orderDirection, pageSize, currentPage)
+                .flatMap(Mono::just);
+    }
+
+    private static Mono<PageCustom<Technology>> validateParameters(String orderDirection, Integer pageSize, Integer currentPage) {
+        if(orderDirection.compareTo(ConstValidation.ASC) != ConstValidation.ZERO &&
+                orderDirection.compareTo(ConstValidation.DESC) != ConstValidation.ZERO) {
+            return Mono.error(new ListTechnologyOrderDirectionInvalidException());
+        }
+
+        if (pageSize <= ConstValidation.ZERO) {
+            return Mono.error(new ListTechnologyPageSizeInvalidException());
+        }
+
+        if(currentPage < ConstValidation.ZERO) {
+            return Mono.error(new ListTechnologyCurrentPageInvalidException());
+        }
+        return null;
     }
 }
