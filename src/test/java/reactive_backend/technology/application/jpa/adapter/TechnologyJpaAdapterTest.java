@@ -6,11 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import reactive_backend.technology.application.jpa.entity.TechnologyEntity;
 import reactive_backend.technology.application.jpa.mapper.ITechnologyEntityMapper;
 import reactive_backend.technology.application.jpa.repository.ITechnologyRepository;
 import reactive_backend.technology.domain.model.Technology;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -56,7 +61,7 @@ class TechnologyJpaAdapterTest {
 
         Mono<Boolean> result = technologyJpaAdapter.technologyExistsByName("Java");
 
-        assertTrue(result.block());
+        assertEquals(Boolean.TRUE, result.block());
         verify(technologyRepository).existsByName("Java");
     }
 
@@ -66,7 +71,28 @@ class TechnologyJpaAdapterTest {
 
         Mono<Boolean> result = technologyJpaAdapter.technologyExistsByName("Python");
 
-        assertFalse(result.block());
+        assertNotEquals(Boolean.TRUE, result.block());
         verify(technologyRepository).existsByName("Python");
     }
+    @Test
+    void getAllTechnologies_WhenValidParameters_ShouldReturnPageCustom() {
+        String orderDirection = "asc";
+        int pageSize = 10;
+        int currentPage = 1;
+        List<TechnologyEntity> technologyEntities = List.of(technologyEntity);
+        List<Technology> technologies = List.of(technology);
+
+        when(technologyRepository.findAllBy(any(Pageable.class))).thenReturn(Flux.fromIterable(technologyEntities));
+        when(technologyRepository.count()).thenReturn(Mono.just((long) technologyEntities.size()));
+        when(technologyEntityMapper.toDomainList(technologyEntities)).thenReturn(technologies);
+
+        StepVerifier.create(technologyJpaAdapter.getAllTechnologies(orderDirection, pageSize, currentPage))
+                .expectNextMatches(pageCustom -> pageCustom.getItems().equals(technologies))
+                .verifyComplete();
+
+        verify(technologyRepository).findAllBy(any(Pageable.class));
+        verify(technologyRepository).count();
+        verify(technologyEntityMapper).toDomainList(technologyEntities);
+    }
+
 }
