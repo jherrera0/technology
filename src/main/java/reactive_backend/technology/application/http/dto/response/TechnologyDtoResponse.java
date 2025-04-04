@@ -1,4 +1,4 @@
-package reactive_backend.technology.application.http.dto;
+package reactive_backend.technology.application.http.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

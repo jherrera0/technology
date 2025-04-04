@@ -15,6 +15,9 @@ public class TechnologyRouter {
 
     @Bean
     public RouterFunction<ServerResponse> technologyRoutes(ITechnologyHandler technologyHandler) {
-        return route(POST(ConstRoute.TECHNOLOGY_REST_ROUTE+ConstRoute.CREATE_TECHNOLOGY_REST_ROUTE), technologyHandler::saveTechnology);
+        return route(POST(ConstRoute.TECHNOLOGY_REST_ROUTE + ConstRoute.CREATE_TECHNOLOGY_REST_ROUTE),
+                technologyHandler::saveTechnology)
+                .andRoute(POST(ConstRoute.TECHNOLOGY_REST_ROUTE + ConstRoute.LIST_TECHNOLOGY_REST_ROUTE),
+                        technologyHandler::listTechnology);
     }
 }

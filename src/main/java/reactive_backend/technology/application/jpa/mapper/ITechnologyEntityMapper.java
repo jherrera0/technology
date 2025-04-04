@@ -6,6 +6,8 @@ import org.mapstruct.ReportingPolicy;
 import reactive_backend.technology.application.jpa.entity.TechnologyEntity;
 import reactive_backend.technology.domain.model.Technology;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
@@ -16,4 +18,6 @@ public interface ITechnologyEntityMapper {
 
     @Mapping(target = "id", ignore = true)
     TechnologyEntity toEntity(Technology domain);
+
+    List<Technology> toDomainList(List<TechnologyEntity> content);
 }
