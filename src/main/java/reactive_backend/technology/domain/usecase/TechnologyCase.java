@@ -8,6 +8,8 @@ import reactive_backend.technology.domain.spi.ITechnologyPersistencePort;
 import reactive_backend.technology.domain.util.ConstValidation;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public class TechnologyCase implements ITechnologyServicePort {
 
     private final ITechnologyPersistencePort technologyPersistencePort;
@@ -39,6 +41,15 @@ public class TechnologyCase implements ITechnologyServicePort {
                     return Mono.just(page);
                 });
     }
+
+    @Override
+    public Mono<List<Technology>> getTechnologiesByName(List<String> names) {
+        return technologyPersistencePort.getAllTechnologiesByName(names)
+                .flatMap(Mono::just);
+    }
+
+
+
 
     private static Mono<PageCustom<Technology>> validateParameters(String orderDirection, Integer pageSize, Integer currentPage) {
         if(orderDirection.compareTo(ConstValidation.ASC) != ConstValidation.ZERO &&
