@@ -210,8 +210,8 @@ class TechnologyHandlerTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isNotEmpty()
-                .jsonPath("$.timestamp").exists();
+                .jsonPath("$.error_get").isNotEmpty()
+                .jsonPath("$.timestamp_get").exists();
     }
 
 

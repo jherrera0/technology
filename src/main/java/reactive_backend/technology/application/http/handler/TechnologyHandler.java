@@ -46,8 +46,8 @@ public class TechnologyHandler implements ITechnologyHandler {
                     return ServerResponse.badRequest()
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(Map.of(
-                                    "error save", error.getMessage(),
-                                    "timestamp save", Instant.now()
+                                    "error_save", error.getMessage(),
+                                    "timestamp_save", Instant.now()
                             ));
                 });
     }
@@ -70,8 +70,8 @@ public class TechnologyHandler implements ITechnologyHandler {
                     return ServerResponse.badRequest()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(Map.of(
-                                "error list", error.getMessage(),
-                                "timestamp list", Instant.now()
+                                "error_list", error.getMessage(),
+                                "timestamp_list", Instant.now()
                         ));}
 
                 );
@@ -94,8 +94,8 @@ public class TechnologyHandler implements ITechnologyHandler {
                     return ServerResponse.badRequest()
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(Map.of(
-                                    "error get", error.getMessage(),
-                                    "timestamp get", Instant.now()
+                                    "error_get", error.getMessage(),
+                                    "timestamp_get", Instant.now()
                             ));
                 });
 
