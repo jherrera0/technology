@@ -12,6 +12,8 @@ import reactive_backend.technology.domain.spi.ITechnologyPersistencePort;
 import reactive_backend.technology.domain.util.ConstValidation;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class TechnologyJpaAdapter implements ITechnologyPersistencePort {
 
@@ -42,6 +44,13 @@ public class TechnologyJpaAdapter implements ITechnologyPersistencePort {
                         (int) Math.ceil((double) tuple.getT2() / pageSize),
                         technologyEntityMapper.toDomainList(tuple.getT1())
                 ));
+    }
+
+    @Override
+    public Mono<List<Technology>> getAllTechnologiesByName(List<String> nameList) {
+        return technologyRepository.findAllByNameIn(nameList)
+                .collectList()
+                .map(technologyEntityMapper::toDomainList);
     }
 
 

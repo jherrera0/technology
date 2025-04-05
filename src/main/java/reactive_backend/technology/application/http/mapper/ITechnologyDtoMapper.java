@@ -7,6 +7,8 @@ import reactive_backend.technology.application.http.dto.request.TechnologyDtoReq
 import reactive_backend.technology.application.http.dto.response.TechnologyDtoResponse;
 import reactive_backend.technology.domain.model.Technology;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
@@ -18,4 +20,6 @@ public interface ITechnologyDtoMapper {
     @Mapping(target = "name", source = "technology.name")
     @Mapping(target = "description", source = "technology.description")
     TechnologyDtoResponse toDtoResponse(Technology technology);
+
+    List<TechnologyDtoResponse> toDtoResponseList(List<Technology> technologyList);
 }

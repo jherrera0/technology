@@ -4,11 +4,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-public interface ITechnologyHandler {
-    Mono<ServerResponse> saveTechnology(ServerRequest request);
-
-    Mono<ServerResponse> listTechnology(ServerRequest request);
-
-    Mono<ServerResponse> getTechnologiesByName(ServerRequest request);
-
+public interface IAbilityHandler {
+    Mono<ServerResponse> addAbility(ServerRequest serverRequest);
 }
