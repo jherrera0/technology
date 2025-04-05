@@ -6,7 +6,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactive_backend.technology.application.http.dto.request.AddAbilityDtoRequest;
 import reactive_backend.technology.application.http.dto.request.GetByNameRequest;
 import reactive_backend.technology.application.http.dto.request.TechnologiesListDtoRequest;
 import reactive_backend.technology.application.http.dto.request.TechnologyDtoRequest;
