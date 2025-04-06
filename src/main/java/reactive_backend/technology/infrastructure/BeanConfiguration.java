@@ -5,11 +5,17 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
+import reactive_backend.technology.application.jpa.adapter.AbilityJpaAdapter;
 import reactive_backend.technology.application.jpa.adapter.TechnologyJpaAdapter;
+import reactive_backend.technology.application.jpa.mapper.IAbilityEntityMapper;
 import reactive_backend.technology.application.jpa.mapper.ITechnologyEntityMapper;
+import reactive_backend.technology.application.jpa.repository.IAbilityRepository;
 import reactive_backend.technology.application.jpa.repository.ITechnologyRepository;
+import reactive_backend.technology.domain.api.IAbilityServicePort;
 import reactive_backend.technology.domain.api.ITechnologyServicePort;
+import reactive_backend.technology.domain.spi.IAbilityPersistencePort;
 import reactive_backend.technology.domain.spi.ITechnologyPersistencePort;
+import reactive_backend.technology.domain.usecase.AbilityCase;
 import reactive_backend.technology.domain.usecase.TechnologyCase;
 
 @Configuration
@@ -17,10 +23,22 @@ import reactive_backend.technology.domain.usecase.TechnologyCase;
 public class BeanConfiguration {
     private final ITechnologyEntityMapper technologyEntityMapper;
     private final ITechnologyRepository technologyRepository;
+    private final IAbilityRepository abilityRepository;
+    private final IAbilityEntityMapper abilityEntityMapper;
 
     @Bean
     public ITechnologyServicePort technologyServicePort() {
         return new TechnologyCase( technologyPersistencePort());
+    }
+
+    @Bean
+    public IAbilityServicePort abilityServicePort() {
+        return new AbilityCase( abilityPersistencePort());
+    }
+
+    @Bean
+    public IAbilityPersistencePort abilityPersistencePort() {
+        return new AbilityJpaAdapter(abilityRepository,abilityEntityMapper);
     }
     @Bean
     public ITechnologyPersistencePort technologyPersistencePort() {
@@ -28,15 +46,24 @@ public class BeanConfiguration {
     }
     @Bean
     public ApplicationRunner initializer(DatabaseClient client) {
-        return args -> client.sql("""
-        CREATE TABLE IF NOT EXISTS technology_entity (
-            id BIGINT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description TEXT,
-            CONSTRAINT uk_technology_name UNIQUE (name)
-        )
+        return args -> {
+            client.sql("""
+            CREATE TABLE IF NOT EXISTS technology_entity (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                description TEXT,
+                CONSTRAINT uk_technology_name UNIQUE (name)
+            )
         """).fetch().rowsUpdated().subscribe();
-    }
 
+            client.sql("""
+            CREATE TABLE IF NOT EXISTS ability_entity (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                technology_id INTEGER NOT NULL,
+                ability_id INTEGER NOT NULL
+            );
+        """).fetch().rowsUpdated().subscribe();
+        };
+    }
 
 }

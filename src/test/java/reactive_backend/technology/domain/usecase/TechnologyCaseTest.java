@@ -138,4 +138,36 @@ class TechnologyCaseTest {
 
         verify(technologyPersistencePort, times(1)).getAllTechnologies(orderDirection, pageSize, currentPage);
     }
+
+    @Test
+    void getTechnologiesByName_ShouldReturnTechnologies_WhenNamesAreValid() {
+        List<String> names = List.of("Java", "Spring");
+        List<Technology> technologies = List.of(
+                new Technology(1, "Java", "A programming language."),
+                new Technology(2, "Spring", "A framework for Java.")
+        );
+
+        when(technologyPersistencePort.getAllTechnologiesByName(names)).thenReturn(Mono.just(technologies));
+
+        StepVerifier.create(technologyCase.getTechnologiesByName(names))
+                .expectNext(technologies)
+                .verifyComplete();
+
+        verify(technologyPersistencePort).getAllTechnologiesByName(names);
+    }
+
+    @Test
+    void getTechnologiesByName_ShouldReturnEmptyList_WhenNoNamesMatch() {
+        List<String> names = List.of("NonExistentTech");
+        List<Technology> emptyList = List.of();
+
+        when(technologyPersistencePort.getAllTechnologiesByName(names)).thenReturn(Mono.just(emptyList));
+
+        StepVerifier.create(technologyCase.getTechnologiesByName(names))
+                .expectNext(emptyList)
+                .verifyComplete();
+
+        verify(technologyPersistencePort).getAllTechnologiesByName(names);
+    }
+
 }

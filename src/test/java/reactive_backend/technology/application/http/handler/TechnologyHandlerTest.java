@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunctions;
+import reactive_backend.technology.application.http.dto.request.GetByNameRequest;
 import reactive_backend.technology.application.http.dto.request.TechnologiesListDtoRequest;
 import reactive_backend.technology.application.http.dto.request.TechnologyDtoRequest;
 import reactive_backend.technology.application.http.dto.response.PageResponse;
@@ -55,6 +56,9 @@ class TechnologyHandlerTest {
                         ConstRoute.CREATE_TECHNOLOGY_REST_ROUTE), technologyHandler::saveTechnology)
                         .andRoute(RequestPredicates.POST(ConstRoute.TECHNOLOGY_REST_ROUTE+
                                 ConstRoute.LIST_TECHNOLOGY_REST_ROUTE), technologyHandler::listTechnology)
+                        .andRoute(RequestPredicates.POST(ConstRoute.TECHNOLOGY_REST_ROUTE+
+                                ConstRoute.GET_TECHNOLOGIES_BY_NAME_REST_ROUTE),
+                                technologyHandler::getTechnologiesByName)
         ).build();
 
         technologyDtoRequest = new TechnologyDtoRequest("Java", "Programming language");
@@ -169,4 +173,46 @@ class TechnologyHandlerTest {
                 .exchange()
                 .expectStatus().isBadRequest();
     }
+    @Test
+    void getTechnologiesByName_shouldReturn200WithTechnologyList() {
+        // Arrange
+        GetByNameRequest request = new GetByNameRequest(List.of("Java", "Python"));
+        Technology tech1 = new Technology(1, "Java", "Lenguaje backend");
+        Technology tech2 = new Technology(2, "Python", "Lenguaje multipropósito");
+
+        List<Technology> techList = List.of(tech1, tech2);
+        List<TechnologyDtoResponse> responseList = techList.stream()
+                .map(t -> new TechnologyDtoResponse(t.getId(), t.getName(), t.getDescription()))
+                .toList();
+
+        when(technologyServicePort.getTechnologiesByName(List.of("Java", "Python")))
+                .thenReturn(Mono.just(techList));
+        when(technologyDtoMapper.toDtoResponseList(techList)).thenReturn(responseList);
+
+        // Act & Assert
+        webTestClient.post()
+                .uri(ConstRoute.TECHNOLOGY_REST_ROUTE+ConstRoute.GET_TECHNOLOGIES_BY_NAME_REST_ROUTE) // Cambia al endpoint real
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(TechnologyDtoResponse.class)
+                .hasSize(2)
+                .contains(responseList.get(0), responseList.get(1));
+    }
+    @Test
+    void getTechnologiesByName_shouldReturn400WhenBodyIsEmpty() {
+        webTestClient.post()
+                .uri(ConstRoute.TECHNOLOGY_REST_ROUTE+ConstRoute.GET_TECHNOLOGIES_BY_NAME_REST_ROUTE) // Ajusta el endpoint real
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("") // Enviamos body vacío
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.error_get").isNotEmpty()
+                .jsonPath("$.timestamp_get").exists();
+    }
+
+
 }

@@ -95,4 +95,21 @@ class TechnologyJpaAdapterTest {
         verify(technologyEntityMapper).toDomainList(technologyEntities);
     }
 
+    @Test
+    void getAllTechnologiesByName_WhenNamesExist_ShouldReturnTechnologies() {
+        List<String> names = List.of("Java", "Python");
+        List<TechnologyEntity> technologyEntities = List.of(technologyEntity);
+        List<Technology> technologies = List.of(technology);
+
+        when(technologyRepository.findAllByNameIn(names)).thenReturn(Flux.fromIterable(technologyEntities));
+        when(technologyEntityMapper.toDomainList(technologyEntities)).thenReturn(technologies);
+
+        StepVerifier.create(technologyJpaAdapter.getAllTechnologiesByName(names))
+                .expectNext(technologies)
+                .verifyComplete();
+
+        verify(technologyRepository).findAllByNameIn(names);
+        verify(technologyEntityMapper).toDomainList(technologyEntities);
+    }
+
 }
