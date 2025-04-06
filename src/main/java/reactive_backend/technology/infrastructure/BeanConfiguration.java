@@ -33,7 +33,7 @@ public class BeanConfiguration {
 
     @Bean
     public IAbilityServicePort abilityServicePort() {
-        return new AbilityCase( abilityPersistencePort());
+        return new AbilityCase( abilityPersistencePort(),technologyPersistencePort());
     }
 
     @Bean
