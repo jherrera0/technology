@@ -7,6 +7,7 @@ import reactive_backend.technology.application.jpa.repository.IAbilityRepository
 import reactive_backend.technology.domain.model.Ability;
 import reactive_backend.technology.domain.spi.IAbilityPersistencePort;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -24,5 +25,15 @@ public class AbilityJpaAdapter implements IAbilityPersistencePort {
                     return relation;
                 })
                 .flatMap(abilityRepository::save).map(abilityEntityMapper::toDomain);
+    }
+
+    @Override
+    public Mono<List<Integer>> getAllTechnologiesByAbilityId(Integer id) {
+        return abilityRepository.findAllByAbilityId(id)
+                .collectList()
+                .map(abilityEntityMapper::toDomainList)
+                .map(abilities -> abilities.stream()
+                        .map(Ability::getTechnologyId)
+                        .toList());
     }
 }

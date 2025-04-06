@@ -81,4 +81,39 @@ class AbilityJpaAdapterTest {
                         throwable instanceof RuntimeException && throwable.getMessage().equals("Repository error"))
                 .verify();
     }
+    @Test
+    void getAllTechnologiesByAbilityIdSuccessfully() {
+        Integer abilityId = 1;
+        AbilityEntity abilityEntity1 = new AbilityEntity(1, 1, 1);
+        AbilityEntity abilityEntity2 = new AbilityEntity(1, 2, 1);
+        List<AbilityEntity> abilityEntities = List.of(abilityEntity1, abilityEntity2);
+        List<Ability> abilities = List.of(new Ability(1, 1, 1), new Ability(1, 2, 1));
+        List<Integer> technologyIds = List.of(1, 2);
+
+        when(abilityRepository.findAllByAbilityId(abilityId)).thenReturn(Flux.fromIterable(abilityEntities));
+        when(abilityEntityMapper.toDomainList(abilityEntities)).thenReturn(abilities);
+
+        Mono<List<Integer>> result = abilityJpaAdapter.getAllTechnologiesByAbilityId(abilityId);
+
+        StepVerifier.create(result)
+                .expectNext(technologyIds)
+                .verifyComplete();
+    }
+
+    @Test
+    void getAllTechnologiesByAbilityIdWithNoTechnologies() {
+        Integer abilityId = 1;
+        List<AbilityEntity> abilityEntities = List.of();
+        List<Ability> abilities = List.of();
+        List<Integer> technologyIds = List.of();
+
+        when(abilityRepository.findAllByAbilityId(abilityId)).thenReturn(Flux.fromIterable(abilityEntities));
+        when(abilityEntityMapper.toDomainList(abilityEntities)).thenReturn(abilities);
+
+        Mono<List<Integer>> result = abilityJpaAdapter.getAllTechnologiesByAbilityId(abilityId);
+
+        StepVerifier.create(result)
+                .expectNext(technologyIds)
+                .verifyComplete();
+    }
 }

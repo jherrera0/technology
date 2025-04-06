@@ -6,6 +6,8 @@ import org.mapstruct.ReportingPolicy;
 import reactive_backend.technology.application.jpa.entity.AbilityEntity;
 import reactive_backend.technology.domain.model.Ability;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
@@ -14,4 +16,6 @@ public interface IAbilityEntityMapper {
     Ability toDomain(AbilityEntity entity);
 
     AbilityEntity toEntity(Ability domain);
+
+    List<Ability> toDomainList(List<AbilityEntity> abilities);
 }

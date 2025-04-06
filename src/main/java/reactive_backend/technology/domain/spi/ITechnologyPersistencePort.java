@@ -12,4 +12,6 @@ public interface ITechnologyPersistencePort {
     Mono<PageCustom<Technology>> getAllTechnologies(String orderDirection, Integer pageSize, Integer currentPage);
 
     Mono<List<Technology>> getAllTechnologiesByName(List<String> nameList);
+
+    Mono<List<Technology>> getTechnologiesById(List<Integer> technologies);
 }
