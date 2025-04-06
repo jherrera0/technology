@@ -41,4 +41,28 @@ public class AbilityHandler implements IAbilityHandler {
                             ));
                 });
     }
+
+    @Override
+    public Mono<ServerResponse> getAllTechnologiesByAbilityId(ServerRequest request) {
+        log.info("ID de habilidad recibido desde Postman: {}", request.queryParams());
+        int id = request.queryParam("id").isPresent()?
+                Integer.parseInt(request.queryParam("id").get()) : 0;
+        return abilityServicePort.getAllTechnologiesByAbilityId(id)
+                .doOnNext(dto -> log.info("Datos recibidos desde Postman para obtener habilidades: {}",
+                        dto))
+                .flatMap(list -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(list)
+                )
+                .onErrorResume(error -> {
+                    log.error("Error al procesar la solicitud de obtener habilidades: {}", error.getMessage());
+                    return ServerResponse.badRequest()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(Map.of(
+                                    "error", error.getMessage(),
+                                    "timestamp", Instant.now()
+                            ));
+                });
+
+    }
 }

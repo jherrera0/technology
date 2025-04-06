@@ -53,5 +53,12 @@ public class TechnologyJpaAdapter implements ITechnologyPersistencePort {
                 .map(technologyEntityMapper::toDomainList);
     }
 
+    @Override
+    public Mono<List<Technology>> getTechnologiesById(List<Integer> technologies) {
+        return technologyRepository.findAllByIdIsIn(technologies)
+                .collectList()
+                .map(technologyEntityMapper::toDomainList);
+    }
+
 
 }
