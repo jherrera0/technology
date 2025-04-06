@@ -78,5 +78,52 @@ class AbilityHandlerTest {
                 .expectNextMatches(serverResponse -> serverResponse.statusCode().is4xxClientError())
                 .verifyComplete();
     }
+    @Test
+    void getAllTechnologiesByAbilityIdSuccessfully() {
+        ServerRequest request = MockServerRequest.builder()
+                .queryParam("id", "1")
+                .build();
+        List<Technology> technologyIds = List.of(new Technology(1,"tech1","tech1"),
+                new Technology(2,"tech2","tech2"),
+                new Technology(3,"tech3","tech3"));
 
+        when(abilityServicePort.getAllTechnologiesByAbilityId(1)).thenReturn(Mono.just(technologyIds));
+
+        Mono<ServerResponse> response = abilityHandler.getAllTechnologiesByAbilityId(request);
+
+        StepVerifier.create(response)
+                .expectNextMatches(serverResponse -> serverResponse.statusCode().is2xxSuccessful())
+                .verifyComplete();
+    }
+
+    @Test
+    void getAllTechnologiesByAbilityIdWithNoTechnologies() {
+        ServerRequest request = MockServerRequest.builder()
+                .queryParam("id", "1")
+                .build();
+        List<Technology> technologyIds = List.of();
+
+        when(abilityServicePort.getAllTechnologiesByAbilityId(1)).thenReturn(Mono.just(technologyIds));
+
+        Mono<ServerResponse> response = abilityHandler.getAllTechnologiesByAbilityId(request);
+
+        StepVerifier.create(response)
+                .expectNextMatches(serverResponse -> serverResponse.statusCode().is2xxSuccessful())
+                .verifyComplete();
+    }
+
+    @Test
+    void getAllTechnologiesByAbilityIdWithErrorInService() {
+        ServerRequest request = MockServerRequest.builder()
+                .queryParam("id", "1")
+                .build();
+
+        when(abilityServicePort.getAllTechnologiesByAbilityId(1)).thenReturn(Mono.error(new RuntimeException("Service error")));
+
+        Mono<ServerResponse> response = abilityHandler.getAllTechnologiesByAbilityId(request);
+
+        StepVerifier.create(response)
+                .expectNextMatches(serverResponse -> serverResponse.statusCode().is4xxClientError())
+                .verifyComplete();
+    }
 }

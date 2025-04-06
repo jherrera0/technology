@@ -111,5 +111,37 @@ class TechnologyJpaAdapterTest {
         verify(technologyRepository).findAllByNameIn(names);
         verify(technologyEntityMapper).toDomainList(technologyEntities);
     }
+    @Test
+    void getTechnologiesById_WhenIdsExist_ShouldReturnTechnologies() {
+        List<Integer> ids = List.of(1);
+        List<TechnologyEntity> technologyEntities = List.of(technologyEntity);
+        List<Technology> technologies = List.of(technology);
 
+        when(technologyRepository.findAllByIdIsIn(ids)).thenReturn(Flux.fromIterable(technologyEntities));
+        when(technologyEntityMapper.toDomainList(technologyEntities)).thenReturn(technologies);
+
+        StepVerifier.create(technologyJpaAdapter.getTechnologiesById(ids))
+                .expectNext(technologies)
+                .verifyComplete();
+
+        verify(technologyRepository).findAllByIdIsIn(ids);
+        verify(technologyEntityMapper).toDomainList(technologyEntities);
+    }
+
+    @Test
+    void getTechnologiesById_WhenIdsDoNotExist_ShouldReturnEmptyList() {
+        List<Integer> ids = List.of(2);
+        List<TechnologyEntity> technologyEntities = List.of();
+        List<Technology> technologies = List.of();
+
+        when(technologyRepository.findAllByIdIsIn(ids)).thenReturn(Flux.fromIterable(technologyEntities));
+        when(technologyEntityMapper.toDomainList(technologyEntities)).thenReturn(technologies);
+
+        StepVerifier.create(technologyJpaAdapter.getTechnologiesById(ids))
+                .expectNext(technologies)
+                .verifyComplete();
+
+        verify(technologyRepository).findAllByIdIsIn(ids);
+        verify(technologyEntityMapper).toDomainList(technologyEntities);
+    }
 }
